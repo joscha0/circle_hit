@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:circle_hit/widgets/LineCircle.dart';
@@ -31,7 +32,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   double _targetValue = 100;
   Color _targetColor = Colors.blue;
   int score = 0;
+  int highscore = 0;
   bool isPlaying = false;
+  double startTime = 0;
+  Timer timer = Timer.periodic(Duration(seconds: 1), (timer) {});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +43,11 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          '$score',
+          isPlaying ? '$score' : "start playing",
+          style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          isPlaying ? '$startTime' : 'highscore $highscore',
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
         SizedBox(
@@ -72,18 +80,42 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                     if (_targetValue - 1 < value && value < _targetValue) {
                       score++;
                       randomizeCircles();
+                      startTimer();
                     }
                   });
                 },
               )
-            : ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    isPlaying = true;
-                    randomizeCircles();
-                  });
-                },
-                child: Text("Play")),
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          score = 0;
+                          isPlaying = true;
+                          randomizeCircles();
+                        });
+                      },
+                      child: Text(
+                        "PLAY survival",
+                        style: TextStyle(
+                            fontSize: 25, fontWeight: FontWeight.bold),
+                      )),
+                  ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          score = 0;
+                          isPlaying = true;
+                          randomizeCircles();
+                        });
+                      },
+                      child: Text(
+                        "PLAY 1 min",
+                        style: TextStyle(
+                            fontSize: 25, fontWeight: FontWeight.bold),
+                      )),
+                ],
+              ),
       ],
     );
   }
@@ -94,5 +126,30 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       _targetColor =
           Colors.primaries[Random().nextInt(Colors.primaries.length)];
     });
+  }
+
+  void startTimer() {
+    startTime = (exp(-(0.04 * score)) * 50) + 10;
+    timer.cancel();
+    timer = new Timer.periodic(
+      Duration(milliseconds: 100),
+      (Timer timer) {
+        if (startTime <= 0) {
+          setState(() {
+            timer.cancel();
+            if (score > highscore) {
+              highscore = score;
+            }
+
+            isPlaying = false;
+            randomizeCircles();
+          });
+        } else {
+          setState(() {
+            startTime--;
+          });
+        }
+      },
+    );
   }
 }
