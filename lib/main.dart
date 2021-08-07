@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:circle_hit/widgets/LineCircle.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(const MyApp());
 
@@ -39,6 +40,23 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   double startTime = 60;
   double time = 60;
   Timer timer = Timer.periodic(Duration(seconds: 1), (timer) {});
+
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  @override
+  void initState() {
+    super.initState();
+    getHighScores();
+  }
+
+  void getHighScores() async {
+    highscoreSurvival = await _prefs.then((SharedPreferences prefs) {
+      return (prefs.getInt('highscoreSurvival') ?? 0);
+    });
+    highscoreOneMin = await _prefs.then((SharedPreferences prefs) {
+      return (prefs.getInt('highscoreOneMin') ?? 0);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -183,17 +201,21 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     timer.cancel();
     timer = new Timer.periodic(
       Duration(milliseconds: 100),
-      (Timer timer) {
+      (Timer timer) async {
         if (time <= 0) {
+          timer.cancel();
+          if (score > highscoreSurvival) {
+            final SharedPreferences prefs = await _prefs;
+            highscoreSurvival = await prefs
+                .setInt("highscoreSurvival", score)
+                .then((bool success) {
+              return score;
+            });
+          }
           setState(() {
-            timer.cancel();
-            if (score > highscoreSurvival) {
-              highscoreSurvival = score;
-            }
-
             isPlaying = false;
-            randomizeCircles();
           });
+          randomizeCircles();
         } else {
           setState(() {
             time--;
@@ -209,17 +231,21 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     timer.cancel();
     timer = new Timer.periodic(
       Duration(seconds: 1),
-      (Timer timer) {
+      (Timer timer) async {
         if (time <= 0) {
+          timer.cancel();
+          if (score > highscoreOneMin) {
+            final SharedPreferences prefs = await _prefs;
+            highscoreOneMin = await prefs
+                .setInt("highscoreOneMin", score)
+                .then((bool success) {
+              return score;
+            });
+          }
           setState(() {
-            timer.cancel();
-            if (score > highscoreOneMin) {
-              highscoreOneMin = score;
-            }
-
             isPlaying = false;
-            randomizeCircles();
           });
+          randomizeCircles();
         } else {
           setState(() {
             time--;
