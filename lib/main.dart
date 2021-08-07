@@ -32,8 +32,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   double _targetValue = 100;
   Color _targetColor = Colors.blue;
   int score = 0;
-  int highscore = 0;
+  int highscoreSurvival = 0;
+  int highscoreOneMin = 0;
   bool isPlaying = false;
+  bool isSurvival = false;
   double startTime = 0;
   Timer timer = Timer.periodic(Duration(seconds: 1), (timer) {});
 
@@ -47,7 +49,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
         ),
         Text(
-          isPlaying ? '$startTime' : 'highscore $highscore',
+          isPlaying
+              ? '$startTime'
+              : 'last score $score' +
+                  (isSurvival ? " (survival)" : " (one min)"),
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
         SizedBox(
@@ -67,7 +72,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           )
         ])),
         SizedBox(
-          height: 100,
+          height: 50,
         ),
         isPlaying
             ? Slider(
@@ -80,7 +85,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                     if (_targetValue - 1 < value && value < _targetValue) {
                       score++;
                       randomizeCircles();
-                      startTimer();
+                      if (isSurvival) {
+                        startSurvival();
+                      }
                     }
                   });
                 },
@@ -93,27 +100,47 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                         setState(() {
                           score = 0;
                           isPlaying = true;
+                          isSurvival = true;
                           randomizeCircles();
                         });
                       },
-                      child: Text(
-                        "PLAY survival",
-                        style: TextStyle(
-                            fontSize: 25, fontWeight: FontWeight.bold),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "PLAY survival",
+                          style: TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.bold),
+                        ),
                       )),
+                  Text(
+                    'highscore $highscoreSurvival',
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    height: 25,
+                  ),
                   ElevatedButton(
                       onPressed: () {
                         setState(() {
                           score = 0;
                           isPlaying = true;
+                          isSurvival = false;
                           randomizeCircles();
+                          startOneMinute();
                         });
                       },
-                      child: Text(
-                        "PLAY 1 min",
-                        style: TextStyle(
-                            fontSize: 25, fontWeight: FontWeight.bold),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "PLAY 1 min",
+                          style: TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.bold),
+                        ),
                       )),
+                  Text(
+                    'highscore $highscoreOneMin',
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
       ],
@@ -128,7 +155,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     });
   }
 
-  void startTimer() {
+  void startSurvival() {
     startTime = (exp(-(0.04 * score)) * 50) + 10;
     timer.cancel();
     timer = new Timer.periodic(
@@ -137,8 +164,33 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         if (startTime <= 0) {
           setState(() {
             timer.cancel();
-            if (score > highscore) {
-              highscore = score;
+            if (score > highscoreSurvival) {
+              highscoreSurvival = score;
+            }
+
+            isPlaying = false;
+            randomizeCircles();
+          });
+        } else {
+          setState(() {
+            startTime--;
+          });
+        }
+      },
+    );
+  }
+
+  void startOneMinute() {
+    startTime = 60;
+    timer.cancel();
+    timer = new Timer.periodic(
+      Duration(seconds: 1),
+      (Timer timer) {
+        if (startTime <= 0) {
+          setState(() {
+            timer.cancel();
+            if (score > highscoreOneMin) {
+              highscoreOneMin = score;
             }
 
             isPlaying = false;
