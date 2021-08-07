@@ -51,8 +51,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         Text(
           isPlaying
               ? '$startTime'
-              : 'last score $score' +
-                  (isSurvival ? " (survival)" : " (one min)"),
+              : 'last score $score' + (isSurvival ? " (survival)" : " (1 min)"),
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
         SizedBox(
@@ -75,22 +74,34 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           height: 50,
         ),
         isPlaying
-            ? Slider(
-                value: _sliderValue,
-                min: 0,
-                max: 100,
-                onChanged: (double value) {
-                  setState(() {
-                    _sliderValue = value;
-                    if (_targetValue - 1 < value && value < _targetValue) {
-                      score++;
-                      randomizeCircles();
-                      if (isSurvival) {
-                        startSurvival();
-                      }
-                    }
-                  });
-                },
+            ? Padding(
+                padding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+                child: SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 20,
+                    thumbColor: Colors.black,
+                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 25.0),
+                    activeTrackColor: _targetColor,
+                    inactiveTrackColor: _targetColor,
+                  ),
+                  child: Slider(
+                    value: _sliderValue,
+                    min: 1,
+                    max: 100,
+                    onChanged: (double value) {
+                      setState(() {
+                        _sliderValue = value;
+                        if (_targetValue - 1 < value && value < _targetValue) {
+                          score++;
+                          randomizeCircles();
+                          if (isSurvival) {
+                            startSurvival();
+                          }
+                        }
+                      });
+                    },
+                  ),
+                ),
               )
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -149,7 +160,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   void randomizeCircles() {
     setState(() {
-      _targetValue = Random().nextDouble() * 100;
+      _targetValue = (Random().nextDouble() + 0.015) * 95;
       _targetColor =
           Colors.primaries[Random().nextInt(Colors.primaries.length)];
     });
