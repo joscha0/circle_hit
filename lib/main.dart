@@ -36,7 +36,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   int highscoreOneMin = 0;
   bool isPlaying = false;
   bool isSurvival = false;
-  double startTime = 0;
+  double startTime = 60;
+  double time = 60;
   Timer timer = Timer.periodic(Duration(seconds: 1), (timer) {});
 
   @override
@@ -48,12 +49,20 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           isPlaying ? '$score' : "start playing",
           style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
         ),
-        Text(
-          isPlaying
-              ? '$startTime'
-              : 'last score $score' + (isSurvival ? " (survival)" : " (1 min)"),
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-        ),
+        isPlaying
+            ? Padding(
+                padding: const EdgeInsets.fromLTRB(75, 25, 75, 0),
+                child: LinearProgressIndicator(
+                  color: _targetColor,
+                  backgroundColor: _targetColor.withOpacity(0.3),
+                  minHeight: 20,
+                  value: time / startTime,
+                ),
+              )
+            : Text(
+                'last score $score' + (isSurvival ? " (survival)" : " (1 min)"),
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+              ),
         SizedBox(
           height: 50,
         ),
@@ -107,6 +116,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
+                      style: ElevatedButton.styleFrom(primary: _targetColor),
                       onPressed: () {
                         setState(() {
                           score = 0;
@@ -131,6 +141,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                     height: 25,
                   ),
                   ElevatedButton(
+                      style: ElevatedButton.styleFrom(primary: _targetColor),
                       onPressed: () {
                         setState(() {
                           score = 0;
@@ -167,12 +178,13 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   }
 
   void startSurvival() {
-    startTime = (exp(-(0.04 * score)) * 50) + 10;
+    time = (exp(-(0.04 * score)) * 50) + 10;
+    startTime = time;
     timer.cancel();
     timer = new Timer.periodic(
       Duration(milliseconds: 100),
       (Timer timer) {
-        if (startTime <= 0) {
+        if (time <= 0) {
           setState(() {
             timer.cancel();
             if (score > highscoreSurvival) {
@@ -184,7 +196,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           });
         } else {
           setState(() {
-            startTime--;
+            time--;
           });
         }
       },
@@ -192,12 +204,13 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   }
 
   void startOneMinute() {
-    startTime = 60;
+    time = 60;
+    startTime = time;
     timer.cancel();
     timer = new Timer.periodic(
       Duration(seconds: 1),
       (Timer timer) {
-        if (startTime <= 0) {
+        if (time <= 0) {
           setState(() {
             timer.cancel();
             if (score > highscoreOneMin) {
@@ -209,7 +222,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           });
         } else {
           setState(() {
-            startTime--;
+            time--;
           });
         }
       },
