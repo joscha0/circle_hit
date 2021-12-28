@@ -68,15 +68,17 @@ class GameController extends GetxController {
     timer = new Timer.periodic(
       Duration(milliseconds: 100),
       (Timer timer) async {
-        if (time <= 0) {
-          timer.cancel();
-          if (score > highscoreSurvival) {
-            box.write("highscoreSurvival", score);
-            isHighScore = true;
+        if (isPlaying) {
+          if (time <= 0) {
+            timer.cancel();
+            if (score > highscoreSurvival) {
+              box.write("highscoreSurvival", score);
+              isHighScore = true;
+            }
+            showScore();
+          } else {
+            time.value--;
           }
-          showScore();
-        } else {
-          time.value--;
         }
       },
     );
@@ -89,16 +91,18 @@ class GameController extends GetxController {
     timer = new Timer.periodic(
       Duration(seconds: 1),
       (Timer timer) async {
-        if (time <= 0) {
-          timer.cancel();
-          if (score > highscoreOneMin) {
-            box.write("highscoreOneMin", score);
-            isHighScore = true;
-          }
+        if (isPlaying) {
+          if (time <= 0) {
+            timer.cancel();
+            if (score > highscoreOneMin) {
+              box.write("highscoreOneMin", score);
+              isHighScore = true;
+            }
 
-          showScore();
-        } else {
-          time.value--;
+            showScore();
+          } else {
+            time.value--;
+          }
         }
       },
     );
@@ -141,18 +145,17 @@ class GameController extends GetxController {
               ),
               ElevatedButton(
                   onPressed: () {
-                    Get.offAll(() => HomePage());
-                  },
-                  style: ElevatedButton.styleFrom(primary: targetColor.value),
-                  child: Text('Home')),
-              ElevatedButton(
-                  onPressed: () {
-                    // Get.off(() => GamePage(), arguments: {'mode': mode});
                     Get.back();
                     start(mode);
                   },
                   style: ElevatedButton.styleFrom(primary: targetColor.value),
                   child: Text('Restart')),
+              ElevatedButton(
+                  onPressed: () {
+                    Get.offAll(() => HomePage());
+                  },
+                  style: ElevatedButton.styleFrom(primary: targetColor.value),
+                  child: Text('Home')),
             ],
           ),
         ),
@@ -162,5 +165,45 @@ class GameController extends GetxController {
     );
   }
 
-  void showPause() {}
+  void showPause() {
+    isPlaying = false;
+    Get.dialog(
+      Center(
+        child: Container(
+          padding: EdgeInsets.all(8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Paused',
+                style: Get.textTheme.headline4?.copyWith(color: Colors.white),
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    Get.back();
+                    isPlaying = true;
+                  },
+                  style: ElevatedButton.styleFrom(primary: targetColor.value),
+                  child: Text('Continue')),
+              ElevatedButton(
+                  onPressed: () {
+                    Get.back();
+                    start(mode);
+                  },
+                  style: ElevatedButton.styleFrom(primary: targetColor.value),
+                  child: Text('Restart')),
+              ElevatedButton(
+                  onPressed: () {
+                    Get.offAll(() => HomePage());
+                  },
+                  style: ElevatedButton.styleFrom(primary: targetColor.value),
+                  child: Text('Home')),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+      barrierColor: Colors.black87,
+    );
+  }
 }
