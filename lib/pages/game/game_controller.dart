@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:circle_hit/pages/game/game_page.dart';
+import 'package:circle_hit/pages/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -14,17 +16,27 @@ class GameController extends GetxController {
   int highscoreOneMin = 0;
   bool isSurvival = false;
   bool isPlaying = true;
+  bool isHighScore = false;
   double startTime = 60;
   RxDouble time = 60.0.obs;
   Timer timer = Timer.periodic(Duration(seconds: 1), (timer) {});
+  late String mode;
 
   final box = GetStorage();
 
   @override
   void onInit() {
-    getHighScores();
     super.onInit();
-    String mode = Get.arguments['mode'] ?? 'survival';
+    mode = Get.arguments['mode'];
+    start(mode);
+  }
+
+  void start(String mode) {
+    randomizeCircles();
+    getHighScores();
+    score = 0;
+    time.value = 60;
+    isPlaying = true;
     switch (mode) {
       case 'survival':
         isSurvival = true;
@@ -60,7 +72,7 @@ class GameController extends GetxController {
           timer.cancel();
           if (score > highscoreSurvival) {
             box.write("highscoreSurvival", score);
-            highscoreSurvival = score;
+            isHighScore = true;
           }
           showScore();
         } else {
@@ -81,7 +93,7 @@ class GameController extends GetxController {
           timer.cancel();
           if (score > highscoreOneMin) {
             box.write("highscoreOneMin", score);
-            highscoreOneMin = score;
+            isHighScore = true;
           }
 
           showScore();
@@ -107,6 +119,48 @@ class GameController extends GetxController {
 
   void showScore() {
     isPlaying = false;
-    Get.defaultDialog(title: 'score: $score', middleText: '', actions: []);
+    Get.dialog(
+      Center(
+        child: Container(
+          padding: EdgeInsets.all(8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Score: $score',
+                style: Get.textTheme.headline4?.copyWith(color: Colors.white),
+              ),
+              Text(
+                isHighScore
+                    ? 'NEW HIGHSCORE!'
+                    : 'Best score: ' +
+                        (isSurvival
+                            ? highscoreSurvival.toString()
+                            : highscoreOneMin.toString()),
+                style: Get.textTheme.headline6?.copyWith(color: Colors.white),
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    Get.offAll(() => HomePage());
+                  },
+                  style: ElevatedButton.styleFrom(primary: targetColor.value),
+                  child: Text('Home')),
+              ElevatedButton(
+                  onPressed: () {
+                    // Get.off(() => GamePage(), arguments: {'mode': mode});
+                    Get.back();
+                    start(mode);
+                  },
+                  style: ElevatedButton.styleFrom(primary: targetColor.value),
+                  child: Text('Restart')),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+      barrierColor: Colors.black87,
+    );
   }
+
+  void showPause() {}
 }
