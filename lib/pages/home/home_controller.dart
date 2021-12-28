@@ -31,18 +31,9 @@ class HomeController extends GetxController {
 
   void pressedSurvival() {
     Get.to(() => GamePage(), arguments: {'mode': 'survival'});
-    // score = 0;
-    // isPlaying.value = true;
-    // isSurvival = true;
-    // randomizeCircles();
   }
 
   void pressedOneMinute() {
     Get.to(() => GamePage(), arguments: {'mode': 'oneMinute'});
-    // score = 0;
-    // isPlaying.value = true;
-    // isSurvival = false;
-    // randomizeCircles();
-    // startOneMinute();
   }
 }
