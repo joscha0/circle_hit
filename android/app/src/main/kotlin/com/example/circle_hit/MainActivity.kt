@@ -1,4 +1,4 @@
-package com.example.circle_hit
+package com.joscha0.circlehit
 
 import io.flutter.embedding.android.FlutterActivity
 
