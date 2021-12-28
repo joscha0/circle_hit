@@ -12,10 +12,15 @@ class GamePage extends GetView<GameController> {
         init: GameController(),
         builder: (c) {
           return Scaffold(
-            floatingActionButton: IconButton(
-              icon: Icon(Icons.pause),
-              onPressed: () => c.showPause(),
-            ),
+            floatingActionButton: c.isPlaying.value
+                ? IconButton(
+                    icon: Icon(
+                      Icons.pause,
+                      size: 32,
+                    ),
+                    onPressed: () => c.showPause(),
+                  )
+                : Container(),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerTop,
             body: Column(
@@ -27,7 +32,6 @@ class GamePage extends GetView<GameController> {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(75, 25, 75, 0),
-
                   child: LinearPercentIndicator(
                     percent:
                         (c.time.value > 0 ? c.time.value : 0) / c.startTime,
@@ -40,12 +44,6 @@ class GamePage extends GetView<GameController> {
                     alignment: MainAxisAlignment.center,
                     linearStrokeCap: LinearStrokeCap.roundAll,
                   ),
-                  // LinearProgressIndicator(
-                  //   color: c.targetColor.value,
-                  //   backgroundColor: c.targetColor.value.withOpacity(0.3),
-                  //   minHeight: 20,
-                  //   value:  c.time.value / c.startTime,
-                  // ),
                 ),
                 SizedBox(
                   height: 50,
@@ -60,7 +58,7 @@ class GamePage extends GetView<GameController> {
                           strokeWidth: 25),
                       LineCircle(
                         size: 2 * c.sliderValue.value,
-                        color: Colors.black,
+                        color: c.isDarkTheme ? Colors.white : Colors.black,
                         strokeWidth: 15,
                       ),
                       SizedBox(
@@ -75,7 +73,7 @@ class GamePage extends GetView<GameController> {
                   child: SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                       trackHeight: 20,
-                      thumbColor: Colors.black,
+                      thumbColor: c.isDarkTheme ? Colors.white : Colors.black,
                       thumbShape:
                           RoundSliderThumbShape(enabledThumbRadius: 25.0),
                       activeTrackColor: c.targetColor.value,

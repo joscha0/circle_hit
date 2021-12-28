@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:circle_hit/pages/game/game_page.dart';
 import 'package:circle_hit/pages/home/home_page.dart';
+import 'package:circle_hit/services/theme_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -15,12 +15,14 @@ class GameController extends GetxController {
   int highscoreSurvival = 0;
   int highscoreOneMin = 0;
   bool isSurvival = false;
-  bool isPlaying = true;
+  RxBool isPlaying = true.obs;
   bool isHighScore = false;
   double startTime = 60;
   RxDouble time = 60.0.obs;
   Timer timer = Timer.periodic(Duration(seconds: 1), (timer) {});
   late String mode;
+
+  bool get isDarkTheme => Get.find<ThemeService>().isDarkMode.value;
 
   final box = GetStorage();
 
@@ -36,7 +38,7 @@ class GameController extends GetxController {
     getHighScores();
     score = 0;
     time.value = 60;
-    isPlaying = true;
+    isPlaying.value = true;
     switch (mode) {
       case 'survival':
         isSurvival = true;
@@ -68,7 +70,7 @@ class GameController extends GetxController {
     timer = new Timer.periodic(
       Duration(milliseconds: 100),
       (Timer timer) async {
-        if (isPlaying) {
+        if (isPlaying.value) {
           if (time <= 0) {
             timer.cancel();
             if (score > highscoreSurvival) {
@@ -91,7 +93,7 @@ class GameController extends GetxController {
     timer = new Timer.periodic(
       Duration(seconds: 1),
       (Timer timer) async {
-        if (isPlaying) {
+        if (isPlaying.value) {
           if (time <= 0) {
             timer.cancel();
             if (score > highscoreOneMin) {
@@ -109,7 +111,7 @@ class GameController extends GetxController {
   }
 
   void changeSlider(double value) {
-    if (isPlaying) {
+    if (isPlaying.value) {
       sliderValue.value = value;
       if (targetValue.value - 1 < value && value < targetValue.value) {
         score++;
@@ -122,7 +124,7 @@ class GameController extends GetxController {
   }
 
   void showScore() {
-    isPlaying = false;
+    isPlaying.value = false;
     Get.dialog(
       Center(
         child: Container(
@@ -134,6 +136,9 @@ class GameController extends GetxController {
                 'Score: $score',
                 style: Get.textTheme.headline4?.copyWith(color: Colors.white),
               ),
+              SizedBox(
+                height: 10,
+              ),
               Text(
                 isHighScore
                     ? 'NEW HIGHSCORE!'
@@ -143,19 +148,47 @@ class GameController extends GetxController {
                             : highscoreOneMin.toString()),
                 style: Get.textTheme.headline6?.copyWith(color: Colors.white),
               ),
+              SizedBox(
+                height: 20,
+              ),
               ElevatedButton(
                   onPressed: () {
                     Get.back();
                     start(mode);
                   },
                   style: ElevatedButton.styleFrom(primary: targetColor.value),
-                  child: Text('Restart')),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Restart',
+                      style: TextStyle(
+                        color: targetColor.value.computeLuminance() < 0.5
+                            ? Colors.white
+                            : Colors.black,
+                        fontSize: 25,
+                      ),
+                    ),
+                  )),
+              SizedBox(
+                height: 10,
+              ),
               ElevatedButton(
                   onPressed: () {
                     Get.offAll(() => HomePage());
                   },
                   style: ElevatedButton.styleFrom(primary: targetColor.value),
-                  child: Text('Home')),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Home',
+                      style: TextStyle(
+                        color: targetColor.value.computeLuminance() < 0.5
+                            ? Colors.white
+                            : Colors.black,
+                        fontSize: 25,
+                      ),
+                    ),
+                  )),
             ],
           ),
         ),
@@ -166,7 +199,7 @@ class GameController extends GetxController {
   }
 
   void showPause() {
-    isPlaying = false;
+    isPlaying.value = false;
     Get.dialog(
       Center(
         child: Container(
@@ -178,26 +211,68 @@ class GameController extends GetxController {
                 'Paused',
                 style: Get.textTheme.headline4?.copyWith(color: Colors.white),
               ),
+              SizedBox(
+                height: 20,
+              ),
               ElevatedButton(
                   onPressed: () {
                     Get.back();
-                    isPlaying = true;
+                    isPlaying.value = true;
                   },
                   style: ElevatedButton.styleFrom(primary: targetColor.value),
-                  child: Text('Continue')),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Continue',
+                      style: TextStyle(
+                        color: targetColor.value.computeLuminance() < 0.5
+                            ? Colors.white
+                            : Colors.black,
+                        fontSize: 25,
+                      ),
+                    ),
+                  )),
+              SizedBox(
+                height: 10,
+              ),
               ElevatedButton(
                   onPressed: () {
                     Get.back();
                     start(mode);
                   },
                   style: ElevatedButton.styleFrom(primary: targetColor.value),
-                  child: Text('Restart')),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Restart',
+                      style: TextStyle(
+                        color: targetColor.value.computeLuminance() < 0.5
+                            ? Colors.white
+                            : Colors.black,
+                        fontSize: 25,
+                      ),
+                    ),
+                  )),
+              SizedBox(
+                height: 10,
+              ),
               ElevatedButton(
                   onPressed: () {
                     Get.offAll(() => HomePage());
                   },
                   style: ElevatedButton.styleFrom(primary: targetColor.value),
-                  child: Text('Home')),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Home',
+                      style: TextStyle(
+                        color: targetColor.value.computeLuminance() < 0.5
+                            ? Colors.white
+                            : Colors.black,
+                        fontSize: 25,
+                      ),
+                    ),
+                  )),
             ],
           ),
         ),

@@ -3,24 +3,32 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
+import 'services/theme_service.dart';
+
 void main() async {
   await GetStorage.init();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyApp extends GetView<ThemeService> {
+  MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.light().copyWith(
-          elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
-      ))),
-      home: HomePage(),
-    );
+    return GetX<ThemeService>(
+        init: ThemeService(),
+        builder: (c) {
+          return GetMaterialApp(
+            debugShowCheckedModeBanner: false,
+            themeMode: c.themeMode.value,
+            theme:
+                ThemeData.light().copyWith(elevatedButtonTheme: c.buttonTheme),
+            darkTheme: ThemeData.dark().copyWith(
+              elevatedButtonTheme: c.buttonTheme,
+              scaffoldBackgroundColor: Colors.black,
+            ),
+            home: HomePage(),
+          );
+        });
   }
 }

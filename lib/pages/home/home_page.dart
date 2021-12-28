@@ -1,3 +1,4 @@
+import 'package:circle_hit/services/theme_service.dart';
 import 'package:circle_hit/widgets/LineCircle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,20 +12,22 @@ class HomePage extends GetView<HomeController> {
         init: HomeController(),
         builder: (c) {
           return Scaffold(
+            floatingActionButton: IconButton(
+              icon: Icon(
+                c.isDarkTheme ? Icons.dark_mode : Icons.light_mode,
+              ),
+              onPressed: c.switchTheme,
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
             body: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   "circle hit",
-                  style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 45, fontWeight: FontWeight.w300),
                 ),
-                // Text(
-                //   'last score ${c.score}' +
-                //       (c.isSurvival ? " (survival)" : " (1 min)"),
-                //   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                // ),
                 SizedBox(
-                  height: 50,
+                  height: 20,
                 ),
                 Center(
                     child: Stack(
@@ -36,7 +39,7 @@ class HomePage extends GetView<HomeController> {
                           strokeWidth: 25),
                       LineCircle(
                         size: 2 * c.sliderValue,
-                        color: Colors.black,
+                        color: c.isDarkTheme ? Colors.white : Colors.black,
                         strokeWidth: 15,
                       ),
                       SizedBox(
@@ -44,7 +47,7 @@ class HomePage extends GetView<HomeController> {
                       )
                     ])),
                 SizedBox(
-                  height: 50,
+                  height: 30,
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -58,33 +61,46 @@ class HomePage extends GetView<HomeController> {
                           child: Text(
                             "PLAY survival",
                             style: TextStyle(
-                                fontSize: 25, fontWeight: FontWeight.bold),
+                                color:
+                                    c.targetColor.value.computeLuminance() < 0.5
+                                        ? Colors.white
+                                        : Colors.black,
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold),
                           ),
                         )),
                     Text(
-                      'highscore ${c.highscoreSurvival}',
-                      style:
-                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                      'Highscore: ${c.highscoreSurvival}',
+                      style: TextStyle(
+                        fontSize: 25,
+                      ),
                     ),
                     SizedBox(
                       height: 25,
                     ),
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                            primary: c.targetColor.value),
+                          primary: c.targetColor.value,
+                        ),
                         onPressed: () => c.pressedOneMinute(),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             "PLAY 1 min",
                             style: TextStyle(
-                                fontSize: 25, fontWeight: FontWeight.bold),
+                                color:
+                                    c.targetColor.value.computeLuminance() < 0.5
+                                        ? Colors.white
+                                        : Colors.black,
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold),
                           ),
                         )),
                     Text(
-                      'highscore ${c.highscoreOneMin}',
-                      style:
-                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                      'Highscore: ${c.highscoreOneMin}',
+                      style: TextStyle(
+                        fontSize: 25,
+                      ),
                     ),
                   ],
                 ),
