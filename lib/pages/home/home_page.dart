@@ -69,11 +69,21 @@ class HomePage extends GetView<HomeController> {
                                 fontWeight: FontWeight.bold),
                           ),
                         )),
-                    Text(
-                      'Highscore: ${c.highscoreSurvival}',
-                      style: TextStyle(
-                        fontSize: 25,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Highscore: ',
+                          style: TextStyle(
+                            fontSize: 25,
+                          ),
+                        ),
+                        Text(
+                          c.highscoreSurvival.toString(),
+                          style: TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.bold),
+                        )
+                      ],
                     ),
                     SizedBox(
                       height: 25,
@@ -96,11 +106,21 @@ class HomePage extends GetView<HomeController> {
                                 fontWeight: FontWeight.bold),
                           ),
                         )),
-                    Text(
-                      'Highscore: ${c.highscoreOneMin}',
-                      style: TextStyle(
-                        fontSize: 25,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Highscore: ',
+                          style: TextStyle(
+                            fontSize: 25,
+                          ),
+                        ),
+                        Text(
+                          c.highscoreOneMin.toString(),
+                          style: TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.bold),
+                        )
+                      ],
                     ),
                   ],
                 ),
