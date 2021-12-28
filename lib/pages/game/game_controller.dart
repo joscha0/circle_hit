@@ -175,6 +175,7 @@ class GameController extends GetxController {
               ElevatedButton(
                   onPressed: () {
                     Get.offAll(() => HomePage());
+                    Get.offAll(() => HomePage()); // fix show score
                   },
                   style: ElevatedButton.styleFrom(primary: targetColor.value),
                   child: Padding(

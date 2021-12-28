@@ -27,7 +27,7 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
-  void getHighScores() async {
+  void getHighScores() {
     highscoreSurvival = box.read('highscoreSurvival') ?? 0;
     highscoreOneMin = box.read('highscoreOneMin') ?? 0;
   }
